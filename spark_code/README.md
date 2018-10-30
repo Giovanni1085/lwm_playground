@@ -22,7 +22,7 @@ Data should be already into the HDFS container somewhere.
 
 Clone this repo locally:
 
-    git clone https://github.com/Giovanni1085/DSG_NCSC_data_prep.git
+    git clone https://github.com/Giovanni1085/lwm_playground.git
 
 Move stuff to HDFS:
 

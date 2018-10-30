@@ -37,7 +37,7 @@ for root, folders, files in os.walk(config.get("locations", "data_folder")):
     for fname in files:
         if ".xml" in fname and not "mets.xml" in fname: # only consider data files
             source_files.append(os.path.join(root,fname))
-logger.info("Number of files:",str(len(source_files)))
+print("Number of files:",str(len(source_files)))
 source_files = s.sparkContext.parallelize(source_files)
 
 # 2) define the function which parses the file and exports a dictionary of information
