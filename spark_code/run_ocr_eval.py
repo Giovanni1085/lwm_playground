@@ -46,8 +46,6 @@ source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations"
 
 # 2) define the function which parses the file and exports a dictionary of information
 def parse_ocr_meta(id_, iterator):
-    "from a valid xml filename, takes out OCR metadata and exposes it as a df row"
-
     for xml_file in iterator:
         filename = xml_file[0]
         if "_mets.xml" in filename or not ".xml" in filename:
@@ -74,8 +72,8 @@ def parse_ocr_meta(id_, iterator):
         # 7: xdpi: 300
         # 8: ydpi: 300
         # 9: source-image: //bl-dun-stor4.bsolbl.local/data01/blend4/2016-01-18_07_04/2016-01-18_07_04_00265.tif
-        yield filename,int(result_list[0]),float(result_list[1]),int(result_list[2]),int(result_list[3]),int(result_list[4])
-        int(result_list[5]),int(result_list[6]),int(result_list[7]),int(result_list[8])
+        yield filename,int(result_list[0]),float(result_list[1]),int(result_list[2]),int(result_list[3]),int(result_list[4]),\
+              int(result_list[5]),int(result_list[6]),int(result_list[7]),int(result_list[8])
 
 # 3) apply to the dataset
 
