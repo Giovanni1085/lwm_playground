@@ -49,6 +49,7 @@ def parse_ocr_meta(files):
     "from a valid xml filename, takes out OCR metadata and exposes it as a df row"
 
     for filename in files:
+        print(filename)
         # open file with bs4
         t = s.sparkContext.textFile(filename)
         soup = BeautifulSoup("\n".join(t.collect()))
@@ -90,6 +91,8 @@ output_schema = StructType([
 
 output = source_files.mapPartitions(parse_ocr_meta) \
             .distinct()
+
+print("Number of output records:",str(output.count()))
 
 sqlc = SQLContext(sparkContext=s.sparkContext)
 
