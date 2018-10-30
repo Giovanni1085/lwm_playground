@@ -30,13 +30,17 @@ logging.basicConfig(level=log_level, format=LOGGING_FORMAT)
 logger = s.sparkContext._jvm.org.apache.log4j.LogManager.getLogger(APP_NAME)
 
 # 1) get all files of interest
-# TODO: find a spark way to do this
+# TODO: find a better spark way to do this
 
+"""
 source_files = list()
 for root, folders, files in os.walk(config.get("locations", "data_folder")):
     for fname in files:
         if ".xml" in fname and not "mets.xml" in fname: # only consider data files
             source_files.append(os.path.join(root,fname))
+"""
+source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml")).map(lambda x: x[0]).collect()
+source_files = [fname for fname in source_files if not "_mets" in fname]
 print("Number of files:",str(len(source_files)))
 source_files = s.sparkContext.parallelize(source_files)
 
