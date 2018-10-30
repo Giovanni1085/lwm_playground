@@ -39,20 +39,21 @@ for root, folders, files in os.walk(config.get("locations", "data_folder")):
         if ".xml" in fname and not "mets.xml" in fname: # only consider data files
             source_files.append(os.path.join(root,fname))
 """
-source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml")).map(lambda x: x[0]).collect()
-source_files = [fname for fname in source_files if not "_mets" in fname]
-print("Number of files:",str(len(source_files)))
-source_files = s.sparkContext.parallelize(source_files,numSlices=REPARTITION_VALUE)
+source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml"))#.map(lambda x: x[0]).collect()
+#source_files = [fname for fname in source_files if not "_mets" in fname]
+#print("Number of files:",str(len(source_files)))
+#source_files = s.sparkContext.parallelize(source_files,numSlices=REPARTITION_VALUE)
 
 # 2) define the function which parses the file and exports a dictionary of information
 def parse_ocr_meta(id_, iterator):
     "from a valid xml filename, takes out OCR metadata and exposes it as a df row"
 
-    for filename in iterator:
-        print(filename)
+    for xml_file in iterator:
+        filename = xml_file[0]
+        contents = xml_file[1]
+        #print(filename)
         # open file with bs4
-        t = s.sparkContext.textFile(filename)
-        soup = BeautifulSoup("\n".join(t.collect()))
+        soup = BeautifulSoup(contents)#"\n".join(t.collect()))
         ocr_meta = soup.find("ocrprocessingstep")
         ocr_text = ocr_meta.processingstepsettings.text
         result_list = list()
