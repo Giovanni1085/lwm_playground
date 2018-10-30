@@ -45,31 +45,33 @@ print("Number of files:",str(len(source_files)))
 source_files = s.sparkContext.parallelize(source_files)
 
 # 2) define the function which parses the file and exports a dictionary of information
-def parse_ocr_meta(filename):
+def parse_ocr_meta(files):
     "from a valid xml filename, takes out OCR metadata and exposes it as a df row"
 
-    # open file with bs4
-    soup = BeautifulSoup(codecs.open(filename, encoding="utf8"))
-    ocr_meta = soup.find("ocrprocessingstep")
-    ocr_text = ocr_meta.processingstepsettings.text
-    result_list = list()
-    for line in ocr_text.splitlines():
-        line = line.strip()
-        line = line.replace("%","")
-        result_list.append(line.split(": ")[1])
-    # structure:
-    # 0: Character Count: 48237
-    # 1: Predicted Word Accuracy: 68.9%
-    # 2: Suspicious Character Count: 9074
-    # 3: Word Count: 8840
-    # 4: Suspicious Word Count: 4350
-    # 5: width: 4583
-    # 6: height: 6189
-    # 7: xdpi: 300
-    # 8: ydpi: 300
-    # 9: source-image: //bl-dun-stor4.bsolbl.local/data01/blend4/2016-01-18_07_04/2016-01-18_07_04_00265.tif
-    yield filename,int(result_list[0]),float(result_list[1]),int(result_list[2]),int(result_list[3]),int(result_list[4])
-    int(result_list[5]),int(result_list[6]),int(result_list[7]),int(result_list[8])
+    for filename in files:
+        print(filename)
+        # open file with bs4
+        soup = BeautifulSoup(codecs.open(filename, encoding="utf8"))
+        ocr_meta = soup.find("ocrprocessingstep")
+        ocr_text = ocr_meta.processingstepsettings.text
+        result_list = list()
+        for line in ocr_text.splitlines():
+            line = line.strip()
+            line = line.replace("%","")
+            result_list.append(line.split(": ")[1])
+        # structure:
+        # 0: Character Count: 48237
+        # 1: Predicted Word Accuracy: 68.9%
+        # 2: Suspicious Character Count: 9074
+        # 3: Word Count: 8840
+        # 4: Suspicious Word Count: 4350
+        # 5: width: 4583
+        # 6: height: 6189
+        # 7: xdpi: 300
+        # 8: ydpi: 300
+        # 9: source-image: //bl-dun-stor4.bsolbl.local/data01/blend4/2016-01-18_07_04/2016-01-18_07_04_00265.tif
+        yield filename,int(result_list[0]),float(result_list[1]),int(result_list[2]),int(result_list[3]),int(result_list[4])
+        int(result_list[5]),int(result_list[6]),int(result_list[7]),int(result_list[8])
 
 # 3) apply to the dataset
 
