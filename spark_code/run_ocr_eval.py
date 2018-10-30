@@ -49,9 +49,9 @@ def parse_ocr_meta(files):
     "from a valid xml filename, takes out OCR metadata and exposes it as a df row"
 
     for filename in files:
-        print(filename)
         # open file with bs4
-        soup = BeautifulSoup(codecs.open(filename, encoding="utf8"))
+        t = s.sparkContext.textFile(filename)
+        soup = BeautifulSoup("\n".join(t.collect()))
         ocr_meta = soup.find("ocrprocessingstep")
         ocr_text = ocr_meta.processingstepsettings.text
         result_list = list()
