@@ -50,6 +50,8 @@ def parse_ocr_meta(id_, iterator):
 
     for xml_file in iterator:
         filename = xml_file[0]
+        if "_mets.xml" in filename or not ".xml" in filename:
+            continue
         contents = xml_file[1]
         #print(filename)
         # open file with bs4
