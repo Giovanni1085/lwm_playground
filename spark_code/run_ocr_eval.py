@@ -86,7 +86,7 @@ output_schema = StructType([
     StructField("ydpi", LongType(), True)
     ])
 
-output = source_files.mapPartitionsWithIndex(parse_ocr_meta) \
+output = source_files.mapPartitions(parse_ocr_meta) \
             .distinct()
 
 sqlc = SQLContext(sparkContext=s.sparkContext)
