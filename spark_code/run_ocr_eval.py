@@ -42,13 +42,13 @@ for root, folders, files in os.walk(config.get("locations", "data_folder")):
 source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml")).map(lambda x: x[0]).collect()
 source_files = [fname for fname in source_files if not "_mets" in fname]
 print("Number of files:",str(len(source_files)))
-source_files = s.sparkContext.parallelize(source_files)
+source_files = s.sparkContext.parallelize(source_files,minPartitions=REPARTITION_VALUE)
 
 # 2) define the function which parses the file and exports a dictionary of information
-def parse_ocr_meta(files):
+def parse_ocr_meta(id_, iterator):
     "from a valid xml filename, takes out OCR metadata and exposes it as a df row"
 
-    for filename in files:
+    for filename in iterator:
         print(filename)
         # open file with bs4
         t = s.sparkContext.textFile(filename)
@@ -89,7 +89,7 @@ output_schema = StructType([
     StructField("ydpi", LongType(), True)
     ])
 
-output = source_files.mapPartitions(parse_ocr_meta) \
+output = source_files.mapPartitionsWithIndex(parse_ocr_meta) \
             .distinct()
 
 print("Number of output records:",str(output.count()))
