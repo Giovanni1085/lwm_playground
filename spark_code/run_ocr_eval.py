@@ -16,7 +16,7 @@ from pyspark.sql import SQLContext
 config = configparser.ConfigParser()
 config.read("config.conf")
 
-REPARTITION_VALUE = 100 # it is quite crucial to properly partition dataframes (especially after the machine learning part, as it tends to skew them). This value should be roughly 2-4x the number of CPUs (or executors) available.
+REPARTITION_VALUE = 1000 # it is quite crucial to properly partition dataframes (especially after the machine learning part, as it tends to skew them). This value should be roughly 2-4x the number of CPUs (or executors) available.
 APP_NAME = config.get("tasks", "app_name")
 num_input_partitions = int(config.get("tasks", "num_input_partitions"))
 num_output_partitions = int(config.get("tasks", "num_output_partitions"))
@@ -30,7 +30,7 @@ logging.basicConfig(level=log_level, format=LOGGING_FORMAT)
 logger = s.sparkContext._jvm.org.apache.log4j.LogManager.getLogger(APP_NAME)
 
 # 1) get all files of interest
-# TODO: find a better spark way to do this
+# TODO: find a better spark way to crawl folders and get xml files
 
 """
 source_files = list()
@@ -44,17 +44,32 @@ source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations"
 #print("Number of files:",str(len(source_files)))
 #source_files = s.sparkContext.parallelize(source_files,numSlices=REPARTITION_VALUE)
 
+# define accumulators
+total_files = s.sparkContext.accumulator(0)
+mets_files = s.sparkContext.accumulator(0)
+alto_files = s.sparkContext.accumulator(0)
+bl_news_files = s.sparkContext.accumulator(0)
+
 # 2) define the function which parses the file and exports a dictionary of information
 def parse_ocr_meta(id_, iterator):
     for xml_file in iterator:
+        total_files.add(1)
         filename = xml_file[0]
-        if "_mets.xml" in filename or not ".xml" in filename:
+        if not ".xml" in filename:
+            continue
+        if "_mets.xml" in filename:
+            mets_files.add(1)
             continue
         contents = xml_file[1]
         #print(filename)
         # open file with bs4
         soup = BeautifulSoup(contents)#"\n".join(t.collect()))
-        ocr_meta = soup.find("ocrprocessingstep")
+        ocr_meta = soup.find("ocrprocessingstep") # OCR details are given in the first ocrProcessingStep element
+        if not ocr_meta:
+            if soup.find("BL_newspaper"):
+                bl_news_files.add(1)
+            continue
+        alto_files.add(1)
         ocr_text = ocr_meta.processingstepsettings.text
         result_list = list()
         for line in ocr_text.splitlines():
@@ -94,6 +109,12 @@ output = source_files.mapPartitionsWithIndex(parse_ocr_meta) \
             .distinct()
 
 print("Number of output records:",str(output.count()))
+
+print("Report")
+print("Total files:",str(total_files.value))
+print("Total ALTO files:",str(alto_files.value))
+print("Total METS files:",str(mets_files.value))
+print("Total UK_newspaper files:",str(bl_news_files.value))
 
 sqlc = SQLContext(sparkContext=s.sparkContext)
 
