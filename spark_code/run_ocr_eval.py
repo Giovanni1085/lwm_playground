@@ -39,7 +39,7 @@ for root, folders, files in os.walk(config.get("locations", "data_folder")):
         if ".xml" in fname and not "mets.xml" in fname: # only consider data files
             source_files.append(os.path.join(root,fname))
 """
-source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml"))#.map(lambda x: x[0]).collect()
+source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml")).repartition(REPARTITION_VALUE)#.map(lambda x: x[0]).collect()
 #source_files = [fname for fname in source_files if not "_mets" in fname]
 #print("Number of files:",str(len(source_files)))
 #source_files = s.sparkContext.parallelize(source_files,numSlices=REPARTITION_VALUE)
@@ -70,6 +70,8 @@ def parse_ocr_meta(id_, iterator):
                 bl_news_files.add(1)
             continue
         alto_files.add(1)
+        if not ocr_meta.find("processingstepsettings"):
+            continue # TODO: are these ALTO files without OCR evaluation? investigate
         ocr_text = ocr_meta.processingstepsettings.text
         result_list = list()
         for line in ocr_text.splitlines():
