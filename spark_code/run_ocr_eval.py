@@ -16,7 +16,7 @@ from pyspark.sql import SQLContext
 config = configparser.ConfigParser()
 config.read("config.conf")
 
-REPARTITION_VALUE = 5000 # it is quite crucial to properly partition dataframes (especially after the machine learning part, as it tends to skew them). This value should be roughly 2-4x the number of CPUs (or executors) available.
+REPARTITION_VALUE = 20000 # it is quite crucial to properly partition dataframes (especially after the machine learning part, as it tends to skew them). This value should be roughly 2-4x the number of CPUs (or executors) available.
 APP_NAME = config.get("tasks", "app_name")
 num_input_partitions = int(config.get("tasks", "num_input_partitions"))
 num_output_partitions = int(config.get("tasks", "num_output_partitions"))
