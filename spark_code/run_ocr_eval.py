@@ -41,7 +41,7 @@ for root, folders, files in os.walk(config.get("locations", "data_folder")):
 """
 source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml")).repartition(REPARTITION_VALUE)#.map(lambda x: x[0]).collect()
 #source_files = [fname for fname in source_files if not "_mets" in fname]
-#print("Number of files:",str(len(source_files)))
+print("Number of files:",str(len(source_files)))
 #source_files = s.sparkContext.parallelize(source_files,numSlices=REPARTITION_VALUE)
 
 # define accumulators

@@ -46,7 +46,7 @@ Submit the process manifest job. This Spark job goes through the manifest, downl
     
     nohup spark-submit --conf spark.executorEnv.PYTHONHASHSEED=321 --conf spark.sql.shuffle.partitions=2000 --conf spark.default.parallelism=2000 --conf spark.driver.memory=24g --conf spark.driver.cores=7 --conf spark.executor.memory=21g --conf spark.executor.cores=3 --num-executors=12 --conf spark.yarn.executor.memoryOverhead=4096 --conf spark.yarn.driver.memoryOverhead=4096 run_ocr_eval.py 1>log.out 2>&1 &
     
-    nohup spark-submit --conf spark.executorEnv.PYTHONHASHSEED=321 --conf spark.sql.shuffle.partitions=10000 --conf spark.default.parallelism=10000 --conf spark.driver.memory=49g --conf spark.driver.cores=7 --conf spark.executor.memory=21g --conf spark.executor.cores=3 --num-executors=240 --conf spark.yarn.executor.memoryOverhead=4096 --conf spark.yarn.driver.memoryOverhead=4096 --conf spark.rpc.message.maxSize=256m run_ocr_eval.py 1>log.out 2>&1 &
+    nohup spark-submit --conf spark.executorEnv.PYTHONHASHSEED=321 --conf spark.sql.shuffle.partitions=20000 --conf spark.default.parallelism=20000 --conf spark.driver.memory=49g --conf spark.driver.cores=7 --conf spark.executor.memory=21g --conf spark.executor.cores=7 --num-executors=120 --conf spark.yarn.executor.memoryOverhead=4096 --conf spark.yarn.driver.memoryOverhead=4096 --conf spark.rpc.message.maxSize=2047 run_ocr_eval.py 1>log.out 2>&1 &
     
 Example of output:
 
