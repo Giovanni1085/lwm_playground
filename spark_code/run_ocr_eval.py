@@ -39,9 +39,9 @@ for root, folders, files in os.walk(config.get("locations", "data_folder")):
         if ".xml" in fname and not "mets.xml" in fname: # only consider data files
             source_files.append(os.path.join(root,fname))
 """
-source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml")).repartition(REPARTITION_VALUE)#.map(lambda x: x[0]).collect()
+source_files = s.sparkContext.wholeTextFiles(os.path.join(config.get("locations", "data_folder"),"*/*/*/*.xml"))#.repartition(REPARTITION_VALUE)#.map(lambda x: x[0]).collect()
 #source_files = [fname for fname in source_files if not "_mets" in fname]
-print("Number of files:",str(len(source_files)))
+print("Number of files:",str(source_files.count()))
 #source_files = s.sparkContext.parallelize(source_files,numSlices=REPARTITION_VALUE)
 
 # define accumulators
@@ -51,7 +51,7 @@ alto_files = s.sparkContext.accumulator(0)
 bl_news_files = s.sparkContext.accumulator(0)
 
 # 2) define the function which parses the file and exports a dictionary of information
-def parse_ocr_meta(id_, iterator):
+def parse_ocr_meta(iterator):
     for xml_file in iterator:
         total_files.add(1)
         filename = xml_file[0]
@@ -107,7 +107,7 @@ output_schema = StructType([
     StructField("ydpi", LongType(), True)
     ])
 
-output = source_files.mapPartitionsWithIndex(parse_ocr_meta) \
+output = source_files.mapPartitions(parse_ocr_meta) \
             .distinct()
 
 print("Number of output records:",str(output.count()))
