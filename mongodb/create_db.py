@@ -59,8 +59,12 @@ for book in metadata:
     print(files)
     volumes = list()
     for f in files:
-        _, number, _ = f.split("_")
-        number = int(number) # cast volume number
+        number = 0
+        try:
+            _, number, _ = f.split("_")
+            number = int(number)  # cast volume number
+        except:
+            print("Missing volume number")
         text_lines = json.loads(codecs.open(os.path.join(current_folder,f)).read())
         full_text = " ".join(l[1].strip() for l in text_lines)
         full_text = " ".join(full_text.split())
