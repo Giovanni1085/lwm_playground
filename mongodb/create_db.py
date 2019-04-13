@@ -37,7 +37,7 @@ mongo_pwd = config.get(db, 'password')
 mongo_auth = config.get(db, 'auth-db')
 mongo_host = config.get(db, 'db-host')
 mongo_port = config.get(db, 'db-port')
-client = MongoClient(mongo_host, connectTimeoutMS=50000, socketTimeoutMS=50000, serverSelectionTimeoutMS=50000)
+client = MongoClient(mongo_host)
 db = client[mongo_db]
 db.authenticate(mongo_user, mongo_pwd, source=mongo_auth)
 
@@ -67,7 +67,8 @@ for book in metadata:
             number = int(number)  # cast volume number
         except:
             print("Missing volume number")
-        text_lines = json.loads(codecs.open(os.path.join(current_folder,f)).read())
+        with codecs.open(os.path.join(current_folder,f)) as read_in:
+            text_lines = json.loads(read_in.read())
         full_text = " ".join(l[1].strip() for l in text_lines)
         full_text = " ".join(full_text.split())
         processed_volume_data.append({"number": number, "text_full":full_text, "text_lines":text_lines, "identifier": identifier})
@@ -76,6 +77,7 @@ for book in metadata:
     books_count += 1
     if len(processed_volume_data) == BATCH_SIZE:
         collection_volumes.insert_many(processed_volume_data)
+        del processed_volume_data
         processed_volume_data = list()
 
 if len(processed_volume_data) > 0:
