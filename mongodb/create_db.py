@@ -42,12 +42,14 @@ db = client[mongo_db]
 db.authenticate(mongo_user, mongo_pwd, source=mongo_auth)
 
 # select where to act in Mongo
-db.drop_collection("books")
-collection = db.books
+db.drop_collection("metadata")
+db.drop_collection("volumes")
+collection_metadata = db.books
+collection_volumes = db.volumes
 
 # Start getting text from files
 # TODO: parallelize
-processed_data = list()
+processed_volume_data = list()
 books_count = 0
 volumes_count = 0
 
@@ -59,7 +61,7 @@ for book in metadata:
     print(files)
     volumes = list()
     for f in files:
-        number = 0
+        number = 0 # default for volumes without number
         try:
             _, number, _ = f.split("_")
             number = int(number)  # cast volume number
@@ -68,19 +70,19 @@ for book in metadata:
         text_lines = json.loads(codecs.open(os.path.join(current_folder,f)).read())
         full_text = " ".join(l[1].strip() for l in text_lines)
         full_text = " ".join(full_text.split())
-        volumes.append({"number": number, "text_full":full_text}) # "text_lines":text_lines,
+        processed_volume_data.append({"number": number, "text_full":full_text, "text_lines":text_lines, "identifier": identifier})
         volumes_count += 1
-    book["volumes"] = volumes
-    processed_data.append(book)
+    book["number_of_volumes"] = len(files)
     books_count += 1
-    if len(processed_data) == BATCH_SIZE:
-        collection.insert_many(processed_data)
-        processed_data = list()
+    if len(processed_volume_data) == BATCH_SIZE:
+        collection_volumes.insert_many(processed_volume_data)
+        processed_volume_data = list()
 
-if len(processed_data) > 0:
-    collection.insert_many(processed_data)
-
+if len(processed_volume_data) > 0:
+    collection_volumes.insert_many(processed_volume_data)
+collection_metadata.insert_many(metadata)
 print("Books and volumes:",books_count,volumes_count)
 
 # Create indexes
-collection.create_index([('identifier', HASHED)], background=True)
+collection_volumes.create_index([('identifier', HASHED)], background=True)
+collection_metadata.create_index([('identifier', HASHED)], background=True)
