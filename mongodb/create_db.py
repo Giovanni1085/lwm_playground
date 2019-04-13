@@ -69,9 +69,9 @@ for book in metadata:
             print("Missing volume number")
         with codecs.open(os.path.join(current_folder,f)) as read_in:
             text_lines = json.loads(read_in.read())
-        full_text = " ".join(l[1].strip() for l in text_lines)
-        full_text = " ".join(full_text.split())
-        processed_volume_data.append({"number": number, "text_full":full_text, "text_lines":text_lines, "identifier": identifier})
+        #full_text = " ".join(l[1].strip() for l in text_lines)
+        #full_text = " ".join(full_text.split())
+        processed_volume_data.append({"number": number, "text_lines":text_lines, "identifier": identifier}) # "text_full":full_text,
         volumes_count += 1
     book["number_of_volumes"] = len(files)
     books_count += 1
