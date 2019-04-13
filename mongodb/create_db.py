@@ -80,6 +80,7 @@ for book in metadata:
         del processed_volume_data[:]
         del processed_volume_data
         processed_volume_data = list()
+        print("Inserted and deleted list")
 
 if len(processed_volume_data) > 0:
     collection_volumes.insert_many(processed_volume_data)
