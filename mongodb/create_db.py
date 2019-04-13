@@ -68,7 +68,7 @@ for book in metadata:
         text_lines = json.loads(codecs.open(os.path.join(current_folder,f)).read())
         full_text = " ".join(l[1].strip() for l in text_lines)
         full_text = " ".join(full_text.split())
-        volumes.append({"number": number, "text_lines":text_lines,"text_full":full_text})
+        volumes.append({"number": number, "text_full":full_text}) # "text_lines":text_lines,
         volumes_count += 1
     book["volumes"] = volumes
     processed_data.append(book)
