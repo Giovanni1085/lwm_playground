@@ -37,7 +37,7 @@ mongo_pwd = config.get(db, 'password')
 mongo_auth = config.get(db, 'auth-db')
 mongo_host = config.get(db, 'db-host')
 mongo_port = config.get(db, 'db-port')
-client = MongoClient(mongo_host)
+client = MongoClient(mongo_host, connectTimeoutMS=50000, socketTimeoutMS=50000, serverSelectionTimeoutMS=50000)
 db = client[mongo_db]
 db.authenticate(mongo_user, mongo_pwd, source=mongo_auth)
 
