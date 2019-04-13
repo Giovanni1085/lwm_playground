@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from pymongo import HASHED, ASCENDING
 
 MODE_TEST = False
-BATCH_SIZE = 5000 # how many books to process before batch ingesting into Mongo
+BATCH_SIZE = 1000 # how many books to process before batch ingesting into Mongo
 
 # Data locations
 # TODO: parametrize
@@ -77,6 +77,7 @@ for book in metadata:
     books_count += 1
     if len(processed_volume_data) == BATCH_SIZE:
         collection_volumes.insert_many(processed_volume_data)
+        del processed_volume_data[:]
         del processed_volume_data
         processed_volume_data = list()
 
