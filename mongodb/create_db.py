@@ -14,8 +14,8 @@ BATCH_SIZE = 1000 # how many books to process before batch ingesting into Mongo
 
 # Data locations
 # TODO: parametrize
-metadata_file = "book_data.json"
-data_folder = "json"
+metadata_file = "/mnt/extra_storage/downloads/book_data.json"
+data_folder = "/mnt/extra_storage/downloads/json"
 if MODE_TEST:
     # Note there are 15 books and 18 volumes in the test dataset
     metadata_file = "test_data/json_book_examples_metadata.json"
@@ -48,6 +48,8 @@ collection = db.books
 # Start getting text from files
 # TODO: parallelize
 processed_data = list()
+books_count = 0
+volumes_count = 0
 
 for book in metadata:
     identifier = book["identifier"]
@@ -63,11 +65,18 @@ for book in metadata:
         full_text = " ".join(l[1].strip() for l in text_lines)
         full_text = " ".join(full_text.split())
         volumes.append({number:{"text_lines":text_lines,"text_full":full_text}})
+        volumes_count += 1
     book["volumes"] = volumes
     processed_data.append(book)
+    books_count += 1
     if len(processed_data) == BATCH_SIZE:
         collection.insert_many(processed_data)
         processed_data = list()
+
+if len(processed_data) > 0:
+    collection.insert_many(processed_data)
+
+print("Books and volumes:",books_count,volumes_count)
 
 # Create indexes
 collection.create_index([('identifier', HASHED)], background=True)
