@@ -9,7 +9,7 @@ from configparser import ConfigParser
 from pymongo import MongoClient
 from pymongo import HASHED, ASCENDING
 
-MODE_TEST = False
+MODE_TEST = True
 BATCH_SIZE = 1000 # how many books to process before batch ingesting into Mongo
 
 # Data locations
