@@ -9,7 +9,7 @@ from configparser import ConfigParser
 from pymongo import MongoClient
 from pymongo import HASHED, ASCENDING
 
-MODE_TEST = True
+MODE_TEST = False
 BATCH_SIZE = 1000 # how many books to process before batch ingesting into Mongo
 
 # Data locations
@@ -44,7 +44,7 @@ db.authenticate(mongo_user, mongo_pwd, source=mongo_auth)
 # select where to act in Mongo
 db.drop_collection("metadata")
 db.drop_collection("volumes")
-collection_metadata = db.books
+collection_metadata = db.metadata
 collection_volumes = db.volumes
 
 # Start getting text from files
